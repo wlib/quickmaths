@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>QuickMaths - Simple Addition</title>
+  <meta hid="description" name="description" content="Learn simple addition">
+  <link rel="stylesheet" href="/dist/index.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="/dist/favicon.ico">
+</head>
+
+<body>
+  <div>
+    <div id="container">
+      <h1 id="question"></h1>
+      <input id="input" autofocus="autofocus" />
+      <p id="emoji"></p>
+    </div>
+  </div>
+  <script src="/dist/index.min.js"></script>
+  <script>
+      quickmaths.state.type = "addition";
+      quickmaths.state.correctAnswer = quickmaths.askQuestion();
+    </script>
+</body>
+
+</html>
