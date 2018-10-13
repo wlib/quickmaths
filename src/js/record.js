@@ -1,5 +1,4 @@
 export default {
-  correct: [],
-  incorrect: [],
-  history: []
+  history: [],
+  previousQuestion: ""
 };

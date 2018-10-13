@@ -10,15 +10,23 @@
         emoji: document.querySelector("#emoji")
     };
     var record = {
-        correct: [],
-        incorrect: [],
-        history: []
+        history: [],
+        previousQuestion: ""
     };
+    function getQuerys() {
+        var query = {};
+        var pairs = document.location.search.substr(1).split("&");
+        pairs.forEach(function (pair) {
+            var _a = pair.split("="), key = _a[0], value = _a[1];
+            query[decodeURIComponent(key)] = JSON.parse(decodeURIComponent(value || ""));
+        });
+        return query;
+    }
+    var queries = getQuerys();
     var state = {
         correctAnswer: undefined,
-        type: undefined,
-        min: 1,
-        max: 50
+        type: queries.type,
+        range: queries.range
     };
     var emojis = {
         bad: ["👿", "😾", "😡", "👎"],
@@ -123,20 +131,35 @@
             "🤣"
         ]
     };
+    function integerInRange(range) {
+        if (Number.isInteger(range)) {
+            return range;
+        }
+        else if (Array.isArray(range)) {
+            var min = range[0], max = range[1];
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+    }
     function askQuestion() {
-        var min = state.min;
-        var max = state.max;
-        var number1 = Math.floor(Math.random() * (max - min + 1)) + min;
-        var number2 = Math.floor(Math.random() * (max - min + 1)) + min;
+        var number1 = integerInRange(state.range[0]);
+        var number2 = integerInRange(state.range[1]);
         elements.input.value = "";
         switch (state.type) {
             case "multiplication":
-                elements.question.innerHTML = number1 + " \u00D7 " + number2;
+                var nextQuestion = number1 + " \u00D7 " + number2;
+                if (nextQuestion === record.previousQuestion) {
+                    return askQuestion();
+                }
+                elements.question.innerHTML = record.previousQuestion = nextQuestion;
                 return number1 * number2;
                 break;
             case "addition":
             default:
-                elements.question.innerHTML = number1 + " + " + number2;
+                var nextQuestion = number1 + " + " + number2;
+                if (nextQuestion === record.previousQuestion) {
+                    return askQuestion();
+                }
+                elements.question.innerHTML = record.previousQuestion = nextQuestion;
                 return number1 + number2;
         }
     }
@@ -149,28 +172,28 @@
         elements.emoji.innerHTML =
             emojis[key][Math.floor(Math.random() * emojis[key].length)];
     }
-    function answerWas(correct) {
+    function check(answered) {
+        var correct = answered === state.correctAnswer;
+        record.history.push({
+            correct: correct,
+            question: record.previousQuestion,
+            answered: answered
+        });
         if (correct) {
-            record.correct.push(elements.question.innerHTML);
-            record.history.push(true);
+            state.correctAnswer = askQuestion();
             showEmoji("positive");
         }
         else {
-            record.incorrect.push(elements.question.innerHTML);
-            record.history.push(false);
+            elements.input.value = "";
             showEmoji("negative");
         }
     }
-    elements.input.onkeypress = function (e) {
+    document.onkeypress = function (e) {
         if (e.key === "Enter") {
-            if (parseInt(elements.input.value) === state.correctAnswer) {
-                answerWas(true);
-                state.correctAnswer = askQuestion();
-            }
-            else {
-                answerWas(false);
-                elements.input.value = "";
-            }
+            check(parseInt(elements.input.value));
+        }
+        else if (e.code === "Space") {
+            alert("paused.");
         }
     };
     var index = {

@@ -3,20 +3,35 @@ import record from "./record.js";
 import state from "./state.js";
 import emojis from "./emojis.js";
 
+function integerInRange(range) {
+  if (Number.isInteger(range)) {
+    return range;
+  } else if (Array.isArray(range)) {
+    const [min, max] = range;
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+}
+
 function askQuestion() {
-  const min = state.min;
-  const max = state.max;
-  const number1 = Math.floor(Math.random() * (max - min + 1)) + min;
-  const number2 = Math.floor(Math.random() * (max - min + 1)) + min;
+  const number1 = integerInRange(state.range[0]);
+  const number2 = integerInRange(state.range[1]);
   elements.input.value = "";
   switch (state.type) {
     case "multiplication":
-      elements.question.innerHTML = `${number1} × ${number2}`;
+      const nextQuestion = `${number1} × ${number2}`;
+      if (nextQuestion === record.previousQuestion) {
+        return askQuestion();
+      }
+      elements.question.innerHTML = record.previousQuestion = nextQuestion;
       return number1 * number2;
       break;
     case "addition":
     default:
-      elements.question.innerHTML = `${number1} + ${number2}`;
+      const nextQuestion = `${number1} + ${number2}`;
+      if (nextQuestion === record.previousQuestion) {
+        return askQuestion();
+      }
+      elements.question.innerHTML = record.previousQuestion = nextQuestion;
       return number1 + number2;
   }
 }
@@ -31,27 +46,27 @@ function showEmoji(key) {
     emojis[key][Math.floor(Math.random() * emojis[key].length)];
 }
 
-function answerWas(correct) {
+function check(answered) {
+  const correct = answered === state.correctAnswer;
+  record.history.push({
+    correct,
+    question: record.previousQuestion,
+    answered
+  });
   if (correct) {
-    record.correct.push(elements.question.innerHTML);
-    record.history.push(true);
+    state.correctAnswer = askQuestion();
     showEmoji("positive");
   } else {
-    record.incorrect.push(elements.question.innerHTML);
-    record.history.push(false);
+    elements.input.value = "";
     showEmoji("negative");
   }
 }
 
-elements.input.onkeypress = e => {
+document.onkeypress = e => {
   if (e.key === "Enter") {
-    if (parseInt(elements.input.value) === state.correctAnswer) {
-      answerWas(true);
-      state.correctAnswer = askQuestion();
-    } else {
-      answerWas(false);
-      elements.input.value = "";
-    }
+    check(parseInt(elements.input.value));
+  } else if (e.code === "Space") {
+    alert("paused.");
   }
 };
 
