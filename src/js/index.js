@@ -16,23 +16,40 @@ function askQuestion() {
   const number1 = integerInRange(state.range[0]);
   const number2 = integerInRange(state.range[1]);
   elements.input.value = "";
+  let nextQuestion;
   switch (state.type) {
-    case "multiplication":
-      const nextQuestion = `${number1} × ${number2}`;
+    case "division":
+      nextQuestion = `${number1 * number2} ÷ ${number1}`;
       if (nextQuestion === record.previousQuestion) {
         return askQuestion();
       }
       elements.question.innerHTML = record.previousQuestion = nextQuestion;
-      return number1 * number2;
+      state.correctAnswer = number2;
+      break;
+    case "multiplication":
+      nextQuestion = `${number1} × ${number2}`;
+      if (nextQuestion === record.previousQuestion) {
+        return askQuestion();
+      }
+      elements.question.innerHTML = record.previousQuestion = nextQuestion;
+      state.correctAnswer = number1 * number2;
+      break;
+    case "subtraction":
+      nextQuestion = `${number1 + number2} - ${number1}`;
+      if (nextQuestion === record.previousQuestion) {
+        return askQuestion();
+      }
+      elements.question.innerHTML = record.previousQuestion = nextQuestion;
+      state.correctAnswer = number2;
       break;
     case "addition":
     default:
-      const nextQuestion = `${number1} + ${number2}`;
+      nextQuestion = `${number1} + ${number2}`;
       if (nextQuestion === record.previousQuestion) {
         return askQuestion();
       }
       elements.question.innerHTML = record.previousQuestion = nextQuestion;
-      return number1 + number2;
+      state.correctAnswer = number1 + number2;
   }
 }
 
@@ -54,7 +71,7 @@ function check(answered) {
     answered
   });
   if (correct) {
-    state.correctAnswer = askQuestion();
+    askQuestion();
     showEmoji("positive");
   } else {
     elements.input.value = "";
@@ -63,7 +80,7 @@ function check(answered) {
 }
 
 document.onkeypress = e => {
-  if (e.key === "Enter") {
+  if (e.key === "Enter" && elements.input.value) {
     check(parseInt(elements.input.value));
   } else if (e.code === "Space") {
     alert("paused.");

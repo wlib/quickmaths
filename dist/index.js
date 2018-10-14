@@ -144,23 +144,40 @@
         var number1 = integerInRange(state.range[0]);
         var number2 = integerInRange(state.range[1]);
         elements.input.value = "";
+        var nextQuestion;
         switch (state.type) {
-            case "multiplication":
-                var nextQuestion = number1 + " \u00D7 " + number2;
+            case "division":
+                nextQuestion = number1 * number2 + " \u00F7 " + number1;
                 if (nextQuestion === record.previousQuestion) {
                     return askQuestion();
                 }
                 elements.question.innerHTML = record.previousQuestion = nextQuestion;
-                return number1 * number2;
+                state.correctAnswer = number2;
+                break;
+            case "multiplication":
+                nextQuestion = number1 + " \u00D7 " + number2;
+                if (nextQuestion === record.previousQuestion) {
+                    return askQuestion();
+                }
+                elements.question.innerHTML = record.previousQuestion = nextQuestion;
+                state.correctAnswer = number1 * number2;
+                break;
+            case "subtraction":
+                nextQuestion = number1 + number2 + " - " + number1;
+                if (nextQuestion === record.previousQuestion) {
+                    return askQuestion();
+                }
+                elements.question.innerHTML = record.previousQuestion = nextQuestion;
+                state.correctAnswer = number2;
                 break;
             case "addition":
             default:
-                var nextQuestion = number1 + " + " + number2;
+                nextQuestion = number1 + " + " + number2;
                 if (nextQuestion === record.previousQuestion) {
                     return askQuestion();
                 }
                 elements.question.innerHTML = record.previousQuestion = nextQuestion;
-                return number1 + number2;
+                state.correctAnswer = number1 + number2;
         }
     }
     function showEmoji(key) {
@@ -180,7 +197,7 @@
             answered: answered
         });
         if (correct) {
-            state.correctAnswer = askQuestion();
+            askQuestion();
             showEmoji("positive");
         }
         else {
@@ -189,7 +206,7 @@
         }
     }
     document.onkeypress = function (e) {
-        if (e.key === "Enter") {
+        if (e.key === "Enter" && elements.input.value) {
             check(parseInt(elements.input.value));
         }
         else if (e.code === "Space") {
