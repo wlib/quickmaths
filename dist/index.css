@@ -1,6 +1,22 @@
+@import url("https://fonts.googleapis.com/css?family=Roboto+Mono:400,700");
 html,
 body {
-  font-family: Roboto, sans-serif;
+  font-family: "Roboto Mono", Monaco, Menlo, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 400;
+  line-height: 1.5;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #595959;
+  background-color: #ffffff;
+  word-wrap: break-word;
+}
+
+a {
+  cursor: pointer;
+  text-decoration: none;
+  color: #3273dc;
 }
 
 #container {
@@ -8,17 +24,27 @@ body {
 }
 
 #question {
-  font-size: 5em;
+  font-size: 12vw;
+  color: #000;
 }
 
 #input {
   text-align: center;
-  font-size: 2em;
+  font-size: 3em;
+  width: 100%;
+  margin-bottom: 5%;
+}
+
+#input:focus {
+  outline: none;
+  border: none;
 }
 
 #emoji {
   text-align: center;
-  font-size: 3em;
+  width: min-content;
+  margin: auto;
+  font-size: 4em;
   opacity: 1;
   transition: opacity 500ms;
 }
